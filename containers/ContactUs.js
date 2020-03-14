@@ -21,6 +21,36 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
+
+Yup.addMethod(Yup.string, "sample", function(anyArgsYouNeed) {
+  var message = anyArgsYouNeed.message;
+  return this.test("test-name", message, function(value) {
+    var _a = this,
+      path = _a.path,
+      createError = _a.createError;
+    var compareValue = anyArgsYouNeed.compareValue;
+    if (typeof value !== "undefined" && value === compareValue) return true;
+    return createError({ path: path, message: message });
+  });
+});
+Yup.addMethod(Yup.string, "validateEmail", function(anyArgsYouNeed) {
+  var message = anyArgsYouNeed.message,
+    pattern = anyArgsYouNeed.pattern;
+  return this.test("validate-email", message, function(value) {
+    var _a = this,
+      path = _a.path,
+      createError = _a.createError;
+    var message = anyArgsYouNeed.message,
+      pattern = anyArgsYouNeed.pattern;
+    console.log(pattern.test(value));
+    if (typeof value !== "undefined" && value && pattern.test(value)) {
+      return true;
+    } else {
+      return createError({ path: path, message: message });
+    }
+    return createError({ path: path, message: message });
+  });
+});
 function validate() {}
 
 const ContactUs = () => {
@@ -84,7 +114,10 @@ const ContactUs = () => {
                 .max(20, "Must be 20 characters or less")
                 .required("Required"),
               companyEmail: Yup.string()
-                .email("Invalid email address")
+                .validateEmail({
+                  message: "Custom Invalid email address",
+                  pattern: new RegExp("[a-z0-9A-Z]+@[a-z]+\.[a-z]{2,3}")
+                })
                 .required("Required"),
               companyName: Yup.string().max(
                 20,
